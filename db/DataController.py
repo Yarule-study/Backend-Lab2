@@ -14,16 +14,19 @@ class DataController:
 
     def read(self):
         with open(self.file, mode='r', newline='') as file:
-            return csv.DictReader(file, fieldnames=self.fields)
+            reader = csv.DictReader(file, fieldnames=self.fields)
+            return list(reader)
     
     def read_all(self):
         with open(self.file, mode='r', newline='') as file:
             return list(csv.DictReader(file, fieldnames=self.fields))
     
     def find(self, value):
-        for entry in self.read():
-            if entry[self.key] == value:
-                return entry
+        with open(self.file, mode='r', newline='') as file:
+            reader = csv.DictReader(file, fieldnames=self.fields)
+            for entry in reader:
+                if entry[self.key] == value:
+                    return entry
         return None
 
     def add(self, *args):
