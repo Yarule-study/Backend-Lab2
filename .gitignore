@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# Pytest cache
+.pytest_cache/
+
+# VSCode settings (if using VSCode)
+.vscode/
+
+# Packages and dependencies
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Logs
+*.log
+
+# Database migrations (if using Django/Flask-migrate)
+migrations/
+
+# IDE specific files
+.idea/
