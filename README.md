@@ -2,16 +2,24 @@
 **Name:** Sviderski Yaroslav Petrovich  
 **Group:** IM-23
 
-# How to run
+# How to Run the Project
 
-1. Install Python.
-2. Navigate to the project folder (`cd <project-folder>`).
-3. Create and activate a virtual environment:
+1. **Install Docker**  
+   Make sure Docker is installed on your system. 
+   You can download it from [here](https://www.docker.com/products/docker-desktop) for your platform.
+
+2. **Navigate to the Project Folder**  
+   Open a terminal and move to the project directory:
    ```bash
-   python -m venv venv
-   source venv/bin/activate
-4. Install the required packages:
+   cd <project-folder>
+3. **Set Environment Variables**
+   Create a .env file in the root of the project folder and specify the following variables:
+   ```makefile
+   POSTGRES_DB=<your_database_name>
+   POSTGRES_USER=<your_database_user>
+   POSTGRES_PASSWORD=<your_database_password>
+   POSTGRES_HOST=<your_host_name>
+4. Run the Container
+   Start the application by running:
    ```bash
-   pip install -r requirements.txt
-5. Run the project:
-   python app.py
+   docker-compose up db
