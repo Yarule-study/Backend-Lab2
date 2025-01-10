@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, abort
 from db.DataController import DataController
 from datetime import datetime
+from db.entities import RecordSchema
 
 api = Blueprint("record", __name__)
 db = DataController("db/records.csv", ["id", "user_id", "category_id", "timestamp", "spent"])
@@ -27,12 +28,17 @@ def record_action():
 
         return jsonify(filtered)
 
-    params = {key: request.json.get(key) for key in ["id", "user_id", "category_id", "spent"]}
-    params["timestamp"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-    added = db.add(*params.values())
-    if not added: abort(409)
-    return jsonify(params)
+    try:
+        record_schema = RecordSchema()
+        params = record_schema.load(request.json)
+        params["timestamp"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        
+        added = db.add(*params.values())
+        if not added:
+            abort(409)
+        return jsonify(record_schema.dump(params)), 201
+    except ValidationError as err:
+        return jsonify({"errors": err.messages}), 400
 
 @api.route("/<record_id>", methods=["GET", "DELETE"])
 def record_id_action(record_id):
