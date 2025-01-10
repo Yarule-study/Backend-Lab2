@@ -1,7 +1,5 @@
-version: '3'
-
 services:
- flask-server:
+  flask-server:
    restart: always
    build:
      context: .
@@ -10,3 +8,8 @@ services:
      PORT: "8080"
    ports:
      - "8080:8080"
+  db:
+    image: postgres:15.4-alpine3.18
+    environment: 
+      POSTGRESS_PASSWORD: ${POSTGRESS_PASSWORD}
+      POSTGRESS_DB: ${POSTGRESS_DB}
