@@ -23,8 +23,5 @@ build/
 # Logs
 *.log
 
-# Database migrations (if using Django/Flask-migrate)
-migrations/
-
 # IDE specific files
 .idea/
