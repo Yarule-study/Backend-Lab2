@@ -1,7 +1,7 @@
 import os
 PROPAGATE_EXCEPTIONS = True
 FLASK_DEBUG = True
-SQLALCHEMY_DATABASE_URI = f'postgresql://{os.environ["POSTGRES_USER"]}:{os.environ["POSTGRES_PASSWORD"]}@db/{os.environ["POSTGRES_DB"]}'
+SQLALCHEMY_DATABASE_URI = f'postgresql://{os.environ["POSTGRES_USER"]}:{os.environ["POSTGRES_PASSWORD"]}@{os.environ["POSTGRES_HOST"]}/{os.environ["POSTGRES_DB"]}'
 API_TITLE = "Finance REST API"
 API_VERSION = "v1.0"
 OPENAPI_VERSION = "3.0.3"

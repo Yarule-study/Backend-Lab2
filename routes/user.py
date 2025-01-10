@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from factory import db
-from db.models import UserModel
+from data_utils.models import UserModel
 
 api = Blueprint("user", __name__)
 

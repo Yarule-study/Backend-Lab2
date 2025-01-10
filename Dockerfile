@@ -15,5 +15,5 @@ RUN python -m pip install -r requirements.txt
 
 COPY . /app
 
-RUN chmod +x /app/migrate.sh
-ENTRYPOINT [ "/app/migrate.sh" ]
+RUN chmod +x /app/run.sh
+ENTRYPOINT [ "/app/run.sh" ]

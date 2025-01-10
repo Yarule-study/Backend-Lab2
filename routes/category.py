@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from factory import db
-from db.models import CategoryModel
+from data_utils.models import CategoryModel
 
 api = Blueprint("category", __name__)
 

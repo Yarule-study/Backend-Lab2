@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from factory import db
-from db.models import RecordModel, IncomeModel
+from data_utils.models import RecordModel, IncomeTrackerModel
 
 api = Blueprint("record", __name__)
 
@@ -27,17 +27,17 @@ def record_action():
 
     try:
         user_id = json_data["user_id"]
-        income = IncomeModel.query.filter_by(user_id=user_id).first()
+        incomeTracker = IncomeTrackerModel.query.filter_by(user_id=user_id).first()
         
-        if not income:
-            abort(400, "User has no income")
+        if not incomeTracker:
+            abort(400, "User has no incomeTracker")
 
         spent = json_data["spent"]
 
-        if income.money < spent:
+        if incomeTracker.money < spent:
             abort(400, "Insufficient funds")
 
-        income.money -= spent
+        incomeTracker.money -= spent
         db.session.commit()
         
         new_record = RecordModel(
