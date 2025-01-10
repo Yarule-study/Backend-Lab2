@@ -1,47 +1,67 @@
 from flask import Blueprint, request, jsonify, abort
-from db.DataController import DataController
-from datetime import datetime
-from db.entities import RecordSchema
+from factory import db
+from db.models import RecordModel, IncomeModel
 
 api = Blueprint("record", __name__)
-db = DataController("db/records.csv", ["id", "user_id", "category_id", "timestamp", "spent"])
 
 @api.route("/", methods=["GET", "POST"])
 def record_action():
     if request.method == "GET":
         user_id = request.args.get("user_id")
         category_id = request.args.get("category_id")
-        
         if not user_id and not category_id:
-            abort(400, description="Both user_id and category_id cannot be empty")
+            abort(400, "Missing 'user_id' or 'category_id' parameter")
         
-        records = db.read()
-        filtered = []
-        for record in records:
-            user_match = user_id and record["user_id"] == user_id
-            category_match = category_id and record["category_id"] == category_id
+        query = RecordModel.query
+        if user_id:
+            query = query.filter_by(user_id=user_id)
+        if category_id:
+            query = query.filter_by(category_id=category_id)
 
-            if (user_id and category_id and user_match and category_match) or \
-               (user_id and user_match) or \
-               (category_id and category_match):
-                filtered.append(record)
+        records = query.all()
+        return jsonify([record.to_dict() for record in records])
 
-        return jsonify(filtered)
+    json_data = request.json
+    if not json_data:
+        abort(400, "Missing JSON data")
 
     try:
-        record_schema = RecordSchema()
-        params = record_schema.load(request.json)
-        params["timestamp"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        user_id = json_data["user_id"]
+        income = IncomeModel.query.filter_by(user_id=user_id).first()
         
-        added = db.add(*params.values())
-        if not added:
-            abort(409)
-        return jsonify(record_schema.dump(params)), 201
-    except ValidationError as err:
-        return jsonify({"errors": err.messages}), 400
+        if not income:
+            abort(400, "User has no income")
 
-@api.route("/<record_id>", methods=["GET", "DELETE"])
+        spent = json_data["spent"]
+
+        if income.money < spent:
+            abort(400, "Insufficient funds")
+
+        income.money -= spent
+        db.session.commit()
+        
+        new_record = RecordModel(
+            user_id=user_id,
+            category_id=json_data["category_id"],
+            spent=spent
+        )
+        db.session.add(new_record)
+        db.session.commit()
+        return jsonify(new_record.to_dict()), 201
+    except KeyError as e:
+        abort(400, f"Missing field: {e}")
+    except Exception as e:
+        abort(500, str(e))
+
+@api.route("/<int:record_id>", methods=["GET", "DELETE"])
 def record_id_action(record_id):
-    record = db.find(record_id) if request.method == "GET" else db.remove(record_id)
-    if not record: abort(404)
-    return jsonify(record)
+    record = RecordModel.query.get(record_id)
+    if not record:
+        abort(404, "Record not found")
+    
+    if request.method == "GET":
+        return jsonify(record.to_dict())
+
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({"message": "Record deleted", "id": record_id})

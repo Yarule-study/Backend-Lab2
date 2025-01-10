@@ -1,28 +1,39 @@
 from flask import Blueprint, request, jsonify, abort
-from db.DataController import DataController
-from db.entities import CategorySchema
+from factory import db
+from db.models import CategoryModel
 
 api = Blueprint("category", __name__)
-db = DataController("db/categories.csv", ["id", "name"])
 
 @api.route("/", methods=["GET", "POST", "DELETE"])
 def category():
     if request.method == "GET":
-        return jsonify(db.read_all())
-    
-    json = request.json
-    id = json.get("id")
+        categories = CategoryModel.query.all()
+        return jsonify([cat.to_dict() for cat in categories])
+
+    json_data = request.json
+    if not json_data:
+        abort(400, "Request must contain JSON data")
+
+    id = json_data.get("id")
 
     if request.method == "POST":
-        try:
-            category_schema = CategorySchema()
-            params = category_schema.load(json)
-            added = db.add(*params.values())
-            if not added: abort(409)
-            return jsonify(record_schema.dump(params)), 201
-        except:
-            return jsonify({"errors": err.messages}), 400
-    
-    found = db.remove(id)
-    if not found: abort(404)
-    return jsonify(found)
+        name = json_data.get("name")
+        if not name:
+            abort(400, "Missing 'name' field")
+        existing_category = CategoryModel.query.filter_by(name=name).first()
+        if existing_category:
+            abort(409, "Category with this name already exists")
+        new_category = CategoryModel(name=name)
+        db.session.add(new_category)
+        db.session.commit()
+        return jsonify(new_category.to_dict()), 201
+
+    if request.method == "DELETE":
+        if not id:
+            abort(400, "Missing 'id' field")
+        category = CategoryModel.query.get(id)
+        if not category:
+            abort(404, "Category not found")
+        db.session.delete(category)
+        db.session.commit()
+        return jsonify({"message": "Category deleted", "id": id})
