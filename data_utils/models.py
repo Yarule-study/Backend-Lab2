@@ -5,9 +5,10 @@ class UserModel(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
 
     record = db.relationship("RecordModel", back_populates="user", lazy="dynamic")
-    incomeTracker = db.relationship("IncomeTrackerModel", back_populates="user", lazy="dynamic")
+    wallet = db.relationship("WalletModel", back_populates="user", lazy="dynamic")
 
     def to_dict(self):
         return {
@@ -15,15 +16,15 @@ class UserModel(db.Model):
             "name": self.name
         }
 
-class IncomeTrackerModel(db.Model):
-    __tablename__ = "incomeTracker"
+class WalletModel(db.Model):
+    __tablename__ = "wallet"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), unique=False, nullable=False
     )
     money = db.Column(db.Float(precision=2), unique=False, nullable=False, default=0)
 
-    user = db.relationship("UserModel", back_populates="incomeTracker")
+    user = db.relationship("UserModel", back_populates="wallet")
 
     def to_dict(self):
         return {

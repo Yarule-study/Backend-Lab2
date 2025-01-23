@@ -13,12 +13,13 @@
    ```bash
    cd <project-folder>
 3. **Set Environment Variables**
-   Create a .env file in the root of the project folder and specify the following variables:
+   Create a .env file in the root of your project folder and put something like:
    ```makefile
-   POSTGRES_DB=<your_database_name>
-   POSTGRES_USER=<your_database_user>
-   POSTGRES_PASSWORD=<your_database_password>
-   POSTGRES_HOST=<your_host_name>
+   POSTGRES_DB=defaultdb
+   POSTGRES_USER=avnadmin
+   POSTGRES_HOST=backend-4-db-labs-backend.e.aivencloud.com:21066
+   PORT=8080
+   JWT_SECRET_KEY=84389718518730203062025172669712122432
 4. Run the Container
    Start the application by running:
    ```bash

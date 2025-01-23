@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify, abort
 from factory import db
 from data_utils.models import CategoryModel
+from flask_jwt_extended import jwt_required
 
 api = Blueprint("category", __name__)
 
+
+@jwt_required()
 @api.route("/", methods=["GET", "POST", "DELETE"])
 def category():
     if request.method == "GET":

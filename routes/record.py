@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, abort
 from factory import db
-from data_utils.models import RecordModel, IncomeTrackerModel
+from data_utils.models import RecordModel, WalletModel
+from flask_jwt_extended import jwt_required
 
 api = Blueprint("record", __name__)
 
+@jwt_required()
 @api.route("/", methods=["GET", "POST"])
 def record_action():
     if request.method == "GET":
@@ -27,17 +29,17 @@ def record_action():
 
     try:
         user_id = json_data["user_id"]
-        incomeTracker = IncomeTrackerModel.query.filter_by(user_id=user_id).first()
+        wallet = WalletModel.query.filter_by(user_id=user_id).first()
         
-        if not incomeTracker:
-            abort(400, "User has no incomeTracker")
+        if not wallet:
+            abort(400, "User has no wallet")
 
         spent = json_data["spent"]
 
-        if incomeTracker.money < spent:
+        if wallet.money < spent:
             abort(400, "Insufficient funds")
 
-        incomeTracker.money -= spent
+        wallet.money -= spent
         db.session.commit()
         
         new_record = RecordModel(
@@ -53,6 +55,7 @@ def record_action():
     except Exception as e:
         abort(500, str(e))
 
+@jwt_required()
 @api.route("/<int:record_id>", methods=["GET", "DELETE"])
 def record_id_action(record_id):
     record = RecordModel.query.get(record_id)
@@ -65,3 +68,4 @@ def record_id_action(record_id):
     db.session.delete(record)
     db.session.commit()
     return jsonify({"message": "Record deleted", "id": record_id})
+
