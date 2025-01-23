@@ -23,3 +23,7 @@
    Start the application by running:
    ```bash
    docker-compose up db
+
+## Notes
+**Deployed site:**
+https://backend-lab3-7rjr.onrender.com
