@@ -24,3 +24,7 @@
    Start the application by running:
    ```bash
    docker-compose up db
+
+## Notes
+**Deployed site:**
+https://backend-lab4-wla3.onrender.com
